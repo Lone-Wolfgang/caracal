@@ -1,0 +1,992 @@
+<meta charset="utf-8">
+<title>Rooikat Watch</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* ---------- tokens: same palette as the desktop page ---------- */
+:root {
+  --f-display: "Cabin", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --f-ui: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --ground:     #f4f4f2;
+  --panel:      #ffffff;
+  --panel-2:    #f7f7f5;
+  --panel-3:    #ededea;
+  --line:       #e4e4e1;
+  --line-2:     #c9c9c5;
+
+  --ink:        #272727;
+  --ink-2:      #5b5a58;
+  --ink-3:      #7e7d7c;
+
+  --accent:     #dc6732;
+  --accent-ink: #b34a1c;
+  --accent-wash:rgba(220, 103, 50, 0.13);
+  --on-accent:  #ffffff;
+
+  --sea:        #e7eaec;
+  --land:       #fbfaf8;
+  --reserve:    #bcd9c7;
+  --park:       #8fbf9f;
+  --park-line:  #4f8a63;
+  --coast:      #b5b4b1;
+  --graticule:  #e0e2e3;
+  --nodata:     #eeeeec;
+
+  --bar:        #dc6732;
+  --bar-sel:    #7f3006;
+
+  --seq-1: #ffd9b8; --seq-2: #ffbb93; --seq-3: #ff9a6b; --seq-4: #f27843;
+  --seq-5: #d15b22; --seq-6: #a8440f; --seq-7: #7f3006;
+  --ord-1: #ff9a6b; --ord-2: #f27843; --ord-3: #d15b22;
+  --ord-4: #a8440f; --ord-5: #7f3006;
+
+  --focus:      #b34a1c;
+  --shadow:     0 1px 2px rgba(39,39,39,.06), 0 6px 20px rgba(39,39,39,.07);
+  --scrim:      rgba(39,39,39,.32);
+  --radius:     5px;
+  --tabbar-h:   56px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:  #171614; --panel: #1c1a18; --panel-2: #24221f; --panel-3: #2d2a27;
+    --line:    #34312d; --line-2: #4a4640;
+    --ink:     #f1efec; --ink-2: #a9a5a0; --ink-3: #7e7a75;
+    --accent:  #e26d38; --accent-ink: #ff9a6b; --accent-wash: rgba(226,109,56,.18);
+    --on-accent: #1a0d05;
+    --sea:     #14181a; --land: #2a2723; --reserve: #2f4a3a; --coast: #57534d;
+    --park: #3b6b4d; --park-line: #6fa883;
+    --graticule: #24221f;
+    --nodata:  #1f1d1b;
+    --bar:     #e26d38; --bar-sel: #ffd9b8;
+    --seq-1: #7f3006; --seq-2: #a8440f; --seq-3: #d15b22; --seq-4: #f27843;
+    --seq-5: #ff9a6b; --seq-6: #ffbb93; --seq-7: #ffd9b8;
+    --ord-1: #a8440f; --ord-2: #d15b22; --ord-3: #f27843;
+    --ord-4: #ff9a6b; --ord-5: #ffbb93;
+    --focus:   #ff9a6b;
+    --shadow:  0 1px 2px rgba(0,0,0,.45), 0 6px 22px rgba(0,0,0,.38);
+    --scrim:   rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"] {
+  --ground:  #171614; --panel: #1c1a18; --panel-2: #24221f; --panel-3: #2d2a27;
+  --line:    #34312d; --line-2: #4a4640;
+  --ink:     #f1efec; --ink-2: #a9a5a0; --ink-3: #7e7a75;
+  --accent:  #e26d38; --accent-ink: #ff9a6b; --accent-wash: rgba(226,109,56,.18);
+  --on-accent: #1a0d05;
+  --sea:     #14181a; --land: #2a2723; --reserve: #2f4a3a; --coast: #57534d;
+  --park: #3b6b4d; --park-line: #6fa883;
+  --graticule: #24221f;
+  --nodata:  #1f1d1b;
+  --bar:     #e26d38; --bar-sel: #ffd9b8;
+  --seq-1: #7f3006; --seq-2: #a8440f; --seq-3: #d15b22; --seq-4: #f27843;
+  --seq-5: #ff9a6b; --seq-6: #ffbb93; --seq-7: #ffd9b8;
+  --ord-1: #a8440f; --ord-2: #d15b22; --ord-3: #f27843;
+  --ord-4: #ff9a6b; --ord-5: #ffbb93;
+  --focus:   #ff9a6b;
+  --shadow:  0 1px 2px rgba(0,0,0,.45), 0 6px 22px rgba(0,0,0,.38);
+  --scrim:   rgba(0,0,0,.55);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overscroll-behavior: none; }
+body {
+  margin: 0; background: var(--ground); color: var(--ink);
+  font-family: var(--f-ui); font-size: 15px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
+}
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+svg.ic { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7;
+         stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* ---------- shell ---------- */
+.app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+
+.top {
+  flex: none; display: flex; align-items: center; gap: 12px;
+  padding: calc(8px + env(safe-area-inset-top, 0px)) 16px 8px;
+  background: var(--panel); border-bottom: 1px solid var(--line);
+}
+.top h1 {
+  font-family: var(--f-display); font-weight: 700; font-size: 15px;
+  margin: 0; letter-spacing: .07em; text-transform: uppercase; white-space: nowrap;
+}
+.count { margin: 0 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15; }
+.count dd { margin: 0; font-family: var(--f-data); font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.count dt { font-family: var(--f-display); font-size: 9.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; order: 2; }
+.fbtn {
+  display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px;
+  border: 1px solid var(--line-2); background: var(--panel-2); border-radius: 19px;
+  font-family: var(--f-display); font-weight: 600; font-size: 13px; flex: none;
+}
+.fbtn svg.ic { width: 17px; height: 17px; }
+.badge {
+  min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent);
+  color: var(--on-accent); font-family: var(--f-data); font-size: 11px; font-weight: 600;
+  display: inline-grid; place-items: center;
+}
+.badge[hidden] { display: none; }
+
+.views { flex: 1; min-height: 0; position: relative; }
+.view { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.view[hidden] { display: none; }
+.scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+.tabbar {
+  flex: none; display: grid; grid-template-columns: repeat(4, 1fr);
+  background: var(--panel); border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.tabbar button {
+  border: 0; background: none; height: var(--tabbar-h); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 3px; color: var(--ink-3);
+  font-family: var(--f-display); font-weight: 500; font-size: 10.5px;
+  letter-spacing: .07em; text-transform: uppercase;
+}
+.tabbar button[aria-selected="true"] { color: var(--accent); font-weight: 700; }
+.tabbar svg.ic { width: 22px; height: 22px; }
+
+/* ---------- map ---------- */
+.mapwrap { position: relative; flex: 1; min-height: 0; background: var(--sea); overflow: hidden; }
+.mapwrap canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.fabs { position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; gap: 8px; }
+.fab {
+  width: 44px; height: 44px; border-radius: 10px; background: var(--panel);
+  border: 1px solid var(--line-2); box-shadow: var(--shadow);
+  display: grid; place-items: center; color: var(--ink-2);
+}
+.fab[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+
+.pop {
+  position: absolute; top: 12px; right: 64px; width: min(250px, calc(100% - 88px));
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: var(--shadow); padding: 12px; display: grid; gap: 12px;
+}
+.pop[hidden] { display: none; }
+.lab {
+  font-family: var(--f-display); font-size: 10.5px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-3); font-weight: 600; margin: 0 0 6px;
+  display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+}
+.lab .val { font-family: var(--f-data); font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.seg { display: flex; background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 8px; padding: 2px; gap: 2px; }
+.seg button {
+  flex: 1; min-height: 36px; border: 0; background: none; padding: 4px 6px; font-size: 12.5px;
+  font-family: var(--f-display); font-weight: 500; border-radius: 6px; color: var(--ink-2);
+}
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--accent); font-weight: 700; box-shadow: var(--shadow); }
+
+.keychip {
+  position: absolute; left: 12px; bottom: 12px; height: 36px; padding: 0 14px; border-radius: 18px;
+  background: var(--panel); border: 1px solid var(--line-2); box-shadow: var(--shadow);
+  font-family: var(--f-display); font-weight: 600; font-size: 12px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-2);
+}
+.keychip[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); }
+.key {
+  position: absolute; left: 12px; bottom: 56px; width: min(260px, calc(100% - 24px));
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: var(--shadow); padding: 11px 13px;
+}
+.key[hidden] { display: none; }
+.key h4 {
+  font-family: var(--f-display); margin: 0 0 7px; font-size: 10.5px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-3); font-weight: 600;
+}
+.key .row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); }
+.key .row + .row { margin-top: 4px; }
+.ramp { display: flex; height: 8px; border-radius: 2px; overflow: hidden; width: 130px; }
+.ramp i { flex: 1; }
+.scalebar { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-family: var(--f-data); font-size: 11px; color: var(--ink-3); }
+.scalebar .bar { height: 3px; background: var(--ink-3); border-radius: 1px; }
+.attrib { font-size: 10px; color: var(--ink-3); margin: 8px 0 0; line-height: 1.35; }
+
+/* ---------- sheets ---------- */
+.scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 80; }
+.scrim[hidden] { display: none; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; max-height: 88vh; max-height: 88dvh;
+  background: var(--panel); border-radius: 14px 14px 0 0; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: sheet-up .22s ease-out; transition: transform .18s ease-out;
+}
+.sheet[hidden] { display: none; }
+@keyframes sheet-up { from { transform: translateY(100%); } }
+/* the point sheet sits above the tab bar and leaves the map usable */
+#psheet {
+  z-index: 50; max-height: 56vh; max-height: 56dvh; padding-bottom: 0;
+  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
+  border-bottom: 1px solid var(--line);
+}
+.grab { flex: none; height: 22px; display: grid; place-items: center; touch-action: none; cursor: grab; }
+.grab i { display: block; width: 38px; height: 4px; border-radius: 2px; background: var(--line-2); }
+.sheet-head { flex: none; display: flex; align-items: flex-start; gap: 10px; padding: 0 16px 10px; }
+.sheet-head h2 { flex: 1; margin: 0; font-family: var(--f-display); font-size: 18px; font-weight: 600; line-height: 1.25; }
+.linkbtn {
+  border: 0; background: none; padding: 4px 2px; font-size: 14px; color: var(--accent-ink);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.linkbtn[disabled] { color: var(--ink-3); text-decoration: none; opacity: .6; cursor: default; }
+.xbtn {
+  width: 36px; height: 36px; border-radius: 18px; border: 1px solid var(--line-2);
+  background: var(--panel-2); color: var(--ink-2); font-size: 18px; line-height: 1; flex: none;
+}
+.sheet-body { flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 18px; overscroll-behavior: contain; }
+.sheet-foot { flex: none; padding: 10px 16px 12px; border-top: 1px solid var(--line); }
+.primary {
+  width: 100%; height: 48px; border-radius: 10px; border: 0; background: var(--accent);
+  color: var(--on-accent); font-family: var(--f-display); font-weight: 700; font-size: 15px;
+}
+
+/* filters */
+.fsec { border-top: 1px solid var(--line); padding: 14px 0; }
+.fsec:first-child { border-top: 0; padding-top: 4px; }
+.fsec > h3, .fsec > summary {
+  font-family: var(--f-display); font-size: 15px; font-weight: 600; margin: 0 0 10px;
+}
+.field + .field { margin-top: 14px; }
+details.fsec > summary { list-style: none; display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; min-height: 28px; }
+details.fsec > summary::-webkit-details-marker { display: none; }
+details.fsec > summary::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-right: 2px solid var(--ink-3); border-bottom: 2px solid var(--ink-3); transform: rotate(45deg); transition: transform .15s; }
+details.fsec[open] > summary::after { transform: rotate(-135deg); }
+details.fsec[open] > summary { margin-bottom: 12px; }
+
+.dual { display: grid; gap: 2px; }
+input[type=range] {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 34px;
+  background: transparent; margin: 0; cursor: pointer;
+}
+input[type=range]::-webkit-slider-runnable-track { height: 4px; background: var(--line-2); border-radius: 2px; }
+input[type=range]::-moz-range-track { height: 4px; background: var(--line-2); border-radius: 2px; }
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent); border: 3px solid var(--panel); margin-top: -10px;
+  box-shadow: 0 0 0 1px var(--line-2), var(--shadow);
+}
+input[type=range]::-moz-range-thumb {
+  width: 24px; height: 24px; border-radius: 50%; background: var(--accent);
+  border: 3px solid var(--panel); box-shadow: 0 0 0 1px var(--line-2);
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  border: 1px solid var(--line-2); background: var(--panel-2); color: var(--ink-2);
+  border-radius: 18px; min-height: 36px; padding: 6px 12px; font-size: 13.5px; line-height: 1.3;
+}
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.chip .n { font-family: var(--f-data); font-size: 11px; opacity: .72; margin-left: 5px; font-variant-numeric: tabular-nums; }
+
+/* sighting detail */
+.kv { display: grid; grid-template-columns: 96px 1fr; gap: 7px 12px; font-size: 14px; margin: 0; }
+.kv dt { font-family: var(--f-display); color: var(--ink-3); font-size: 11px; letter-spacing: .07em; text-transform: uppercase; padding-top: 2px; font-weight: 600; }
+.kv dd { margin: 0; font-family: var(--f-data); font-size: 13px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.quote {
+  margin: 14px 0 0; padding: 10px 12px; background: var(--panel-2);
+  border-left: 2px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 14px; line-height: 1.55; color: var(--ink-2);
+}
+.quote h5 { margin: 0 0 4px; font-family: var(--f-display); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+.pill {
+  display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 20px; font-size: 12px;
+  background: var(--accent-wash); color: var(--accent-ink); font-weight: 500;
+}
+
+/* ---------- animals ---------- */
+.catstrip {
+  flex: none; display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px;
+  background: var(--panel); border-bottom: 1px solid var(--line);
+  scroll-snap-type: x proximity; scrollbar-width: none;
+}
+.catstrip::-webkit-scrollbar { display: none; }
+.catchip {
+  flex: none; scroll-snap-align: start; text-align: left; border: 1px solid var(--line-2);
+  background: var(--panel-2); border-radius: 10px; padding: 6px 12px; min-height: 44px;
+}
+.catchip .nm { display: block; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.catchip .ct { display: block; font-family: var(--f-data); font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+.catchip[aria-pressed="true"] { background: var(--accent-wash); border-color: var(--accent); }
+.catchip[aria-pressed="true"] .nm { color: var(--accent-ink); }
+.catsum { flex: none; margin: 0; padding: 8px 16px; font-size: 13px; color: var(--ink-2); background: var(--panel); border-bottom: 1px solid var(--line); line-height: 1.45; }
+.catsum b { color: var(--ink); font-weight: 600; }
+.catsum .muted { display: block; color: var(--ink-3); font-size: 12px; }
+.playbar {
+  flex: none; display: flex; align-items: center; gap: 12px; padding: 8px 16px;
+  border-top: 1px solid var(--line); background: var(--panel);
+}
+.playbtn {
+  width: 44px; height: 44px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  border: 1px solid var(--line-2); background: var(--panel-2); color: var(--ink); font-size: 13px;
+}
+.playbar .stack { flex: 1; min-width: 0; }
+.playbar .meta { display: flex; justify-content: space-between; font-family: var(--f-data); font-size: 12px; font-variant-numeric: tabular-nums; }
+.playbar .meta span + span { color: var(--ink-3); }
+.playbar input[type=range] { height: 28px; }
+
+/* ---------- patterns & about ---------- */
+.page { padding: 16px 16px 28px; }
+.lede { color: var(--ink-2); font-size: 14.5px; margin: 0 0 14px; }
+.lede strong { color: var(--ink); font-weight: 600; }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 14px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.tile dt { font-family: var(--f-display); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; line-height: 1.3; }
+.tile dd { margin: 4px 0 0; font-family: var(--f-data); font-size: 21px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.05; }
+.tile dd .unit { font-size: 11.5px; color: var(--ink-3); font-weight: 400; margin-left: 3px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 14px 10px; }
+.card + .card { margin-top: 12px; }
+.card > h3 { margin: 0 0 2px; font-family: var(--f-display); font-size: 16px; font-weight: 600; }
+.card > .sub { margin: 0 0 10px; font-size: 12.5px; color: var(--ink-3); line-height: 1.45; }
+.card > .readout { margin: 6px 0 0; min-height: 1.5em; font-size: 13px; color: var(--ink-2); }
+.card > .readout b { color: var(--ink); font-weight: 600; }
+figure { margin: 0; }
+svg.chart { display: block; width: 100%; height: auto; overflow: visible; }
+svg.chart text { font-family: var(--f-data); fill: var(--ink-3); font-size: 9.5px; }
+svg.chart text.val { fill: var(--ink-2); font-weight: 500; }
+svg.chart .grid-line { stroke: var(--line); stroke-width: 1; }
+svg.chart .bar { fill: var(--bar); }
+svg.chart .bar.dim { fill: var(--line-2); }
+svg.chart .bar.hot { fill: var(--bar-sel); }
+svg.chart .hit { fill: transparent; cursor: pointer; }
+
+.notes h3 { font-family: var(--f-display); font-size: 17px; margin: 22px 0 6px; }
+.notes h3:first-child { margin-top: 0; }
+.notes p, .notes li { font-size: 14.5px; color: var(--ink-2); line-height: 1.6; }
+.notes ul { padding-left: 18px; margin: 6px 0; }
+.notes a { color: var(--accent-ink); text-underline-offset: 2px; }
+.notes code { font-family: var(--f-data); font-size: 12.5px; background: var(--panel-2); padding: 1px 4px; border-radius: 3px; color: var(--ink); }
+.deskbtn {
+  display: flex; align-items: center; justify-content: center; height: 46px; margin-top: 22px;
+  border: 1px solid var(--line-2); border-radius: 10px; background: var(--panel);
+  color: var(--ink); text-decoration: none; font-family: var(--f-display); font-weight: 600;
+}
+.empty { padding: 30px 16px; text-align: center; color: var(--ink-3); font-size: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="app">
+  <header class="top">
+    <h1>Rooikat Watch</h1>
+    <dl class="count"><dt id="ro-of">sightings</dt><dd id="ro-n">&mdash;</dd></dl>
+    <button class="fbtn" id="fbtn" aria-expanded="false" aria-controls="fsheet">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+      Filters <span class="badge" id="badge" hidden></span>
+    </button>
+  </header>
+
+  <main class="views">
+    <section class="view" id="view-map" role="tabpanel" aria-labelledby="tab-map">
+      <div class="mapwrap">
+        <canvas id="map" aria-label="Map of caracal sightings"></canvas>
+        <div class="fabs">
+          <button class="fab" id="layers-btn" aria-expanded="false" aria-controls="layers" aria-label="Map layers">
+            <svg class="ic" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 13 9 5 9-5"/></svg>
+          </button>
+          <button class="fab" id="zfit" aria-label="Reset view">
+            <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4"/></svg>
+          </button>
+        </div>
+        <div class="pop" id="layers" hidden>
+          <div>
+            <p class="lab">Area</p>
+            <div class="seg" id="seg-region" role="group" aria-label="Map extent">
+              <button data-v="pen" aria-pressed="true">Cape Peninsula</button>
+              <button data-v="nat" aria-pressed="false">South Africa</button>
+            </div>
+          </div>
+          <div>
+            <p class="lab">Style</p>
+            <div class="seg" id="seg-mode" role="group" aria-label="Map style">
+              <button data-v="pts" aria-pressed="true">Points</button>
+              <button data-v="den" aria-pressed="false">Density</button>
+            </div>
+          </div>
+        </div>
+        <button class="keychip" id="keybtn" aria-expanded="false" aria-controls="key">Key</button>
+        <div class="key" id="key" hidden></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-indiv" role="tabpanel" aria-labelledby="tab-indiv" hidden>
+      <div class="catstrip" id="catstrip" aria-label="Ear-tagged individuals"></div>
+      <p class="catsum" id="catsum"></p>
+      <div class="mapwrap">
+        <canvas id="imap" aria-label="Map of one caracal's sightings"></canvas>
+        <div class="fabs">
+          <button class="fab" id="izfit" aria-label="Reset view">
+            <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="playbar">
+        <button class="playbtn" id="play" aria-label="Play sightings through time">&#9654;</button>
+        <div class="stack">
+          <div class="meta"><span id="istamp"></span><span id="icount"></span></div>
+          <input type="range" id="iscrub" min="0" max="100" value="100" aria-label="Sighting timeline">
+        </div>
+      </div>
+    </section>
+
+    <section class="view scroll" id="view-pat" role="tabpanel" aria-labelledby="tab-pat" hidden>
+      <div class="page">
+        <p class="lede" id="pat-lede"></p>
+        <dl class="tiles" id="tiles"></dl>
+        <div class="card">
+          <h3>Hour of day</h3>
+          <p class="sub">Caracals are most active at dawn and dusk, but reports also follow when people are outside.</p>
+          <figure id="ch-hour"></figure>
+          <p class="readout" id="rd-hour"></p>
+        </div>
+        <div class="card">
+          <h3>What the observer was doing</h3>
+          <p class="sub">Tap a bar to filter everything to that activity.</p>
+          <figure id="ch-act"></figure>
+          <p class="readout" id="rd-act"></p>
+        </div>
+        <div class="card">
+          <h3>Month</h3>
+          <p class="sub">Southern-hemisphere seasons: winter is June&ndash;August.</p>
+          <figure id="ch-month"></figure>
+          <p class="readout" id="rd-month"></p>
+        </div>
+        <div class="card">
+          <h3>Reports per year</h3>
+          <p class="sub" id="year-sub"></p>
+          <figure id="ch-year"></figure>
+          <p class="readout" id="rd-year"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="view scroll" id="view-about" role="tabpanel" aria-labelledby="tab-about" hidden>
+      <div class="page">
+        <div class="notes" id="notes"></div>
+        <a class="deskbtn" href="caracal.html?desktop=1">View the desktop version</a>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar" role="tablist" aria-label="Views">
+    <button role="tab" id="tab-map" aria-selected="true" aria-controls="view-map">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>Map
+    </button>
+    <button role="tab" id="tab-indiv" aria-selected="false" aria-controls="view-indiv">
+      <svg class="ic" viewBox="0 0 24 24"><circle cx="5.5" cy="10.5" r="1.9"/><circle cx="9.5" cy="6" r="1.9"/><circle cx="14.5" cy="6" r="1.9"/><circle cx="18.5" cy="10.5" r="1.9"/><path d="M12 11.5c-2.8 0-5.2 3.4-5.2 5.8 0 1.6 1.2 2.4 2.6 2.4 1 0 1.7-.5 2.6-.5s1.6.5 2.6.5c1.4 0 2.6-.8 2.6-2.4 0-2.4-2.4-5.8-5.2-5.8z"/></svg>Animals
+    </button>
+    <button role="tab" id="tab-pat" aria-selected="false" aria-controls="view-pat">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/></svg>Patterns
+    </button>
+    <button role="tab" id="tab-about" aria-selected="false" aria-controls="view-about">
+      <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.6v.2"/></svg>About
+    </button>
+  </nav>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<aside class="sheet" id="fsheet" role="dialog" aria-modal="true" aria-labelledby="fsheet-title" hidden>
+  <div class="grab" aria-hidden="true"><i></i></div>
+  <div class="sheet-head">
+    <h2 id="fsheet-title">Filters</h2>
+    <button class="linkbtn" id="reset" disabled>Reset</button>
+  </div>
+  <div class="sheet-body">
+    <section class="fsec">
+      <h3>When</h3>
+      <div class="field">
+        <p class="lab">Year <span class="val" id="lab-year"></span></p>
+        <div class="dual">
+          <input type="range" id="yr-min" aria-label="Earliest year">
+          <input type="range" id="yr-max" aria-label="Latest year">
+        </div>
+      </div>
+      <div class="field">
+        <p class="lab">Hour of day <span class="val" id="lab-hour"></span></p>
+        <div class="dual">
+          <input type="range" id="hr-min" min="0" max="23" value="0" aria-label="Earliest hour">
+          <input type="range" id="hr-max" min="0" max="23" value="23" aria-label="Latest hour">
+        </div>
+      </div>
+    </section>
+    <section class="fsec">
+      <h3>What the observer was doing</h3>
+      <div class="chips" id="act-chips"></div>
+    </section>
+    <details class="fsec" id="more">
+      <summary>More filters <span class="badge" id="more-n" hidden></span></summary>
+      <div class="field">
+        <p class="lab">Marked animals</p>
+        <div class="seg" id="seg-tag" role="group" aria-label="Marked animals">
+          <button data-v="all" aria-pressed="true">All</button>
+          <button data-v="tag" aria-pressed="false">Ear-tagged</button>
+          <button data-v="id" aria-pressed="false">Named</button>
+        </div>
+      </div>
+      <div class="field">
+        <p class="lab">Dog present</p>
+        <div class="seg" id="seg-dog" role="group" aria-label="Dog present">
+          <button data-v="all" aria-pressed="true">All</button>
+          <button data-v="yes" aria-pressed="false">With dog</button>
+          <button data-v="no" aria-pressed="false">No dog</button>
+        </div>
+      </div>
+      <div class="field">
+        <p class="lab">Caracals seen</p>
+        <div class="seg" id="seg-grp" role="group" aria-label="Number of caracals">
+          <button data-v="all" aria-pressed="true">All</button>
+          <button data-v="1" aria-pressed="false">Single</button>
+          <button data-v="2" aria-pressed="false">2 or more</button>
+        </div>
+      </div>
+      <div class="field">
+        <p class="lab">Table Mountain National Park</p>
+        <div class="seg" id="seg-park" role="group" aria-label="Inside Table Mountain National Park">
+          <button data-v="all" aria-pressed="true">All</button>
+          <button data-v="in" aria-pressed="false">Inside</button>
+          <button data-v="out" aria-pressed="false">Outside</button>
+        </div>
+      </div>
+    </details>
+  </div>
+  <div class="sheet-foot"><button class="primary" id="fdone"></button></div>
+</aside>
+
+<aside class="sheet" id="psheet" aria-labelledby="psheet-title" hidden></aside>
+
+<script type="application/json" id="sightings-data">/*INJECT:SIGHTINGS*/</script>
+<script type="application/json" id="basemap-data">/*INJECT:BASEMAP*/</script>
+
+<script>/*INJECT:CORE*/</script>
+
+<script>
+(function () {
+"use strict";
+
+var C = Core;
+var ALL = C.ALL, BASE = C.BASE, MONTHS = C.MONTHS, S = C.S, CATS = C.CATS, ACTS = C.ACTS,
+    Y0 = C.Y0, Y1 = C.Y1, LATEST = C.LATEST, PARTIAL_YEAR = C.PARTIAL_YEAR;
+var $ = function (id) { return document.getElementById(id); };
+var esc = C.esc, fmtDate = C.fmtDate, pad2 = C.pad2, SEQ = C.SEQ, ORD = C.ORD;
+var each = function (list, f) { Array.prototype.forEach.call(list, f); };
+var plural = function (n, w) { return n.toLocaleString() + " " + w + (n === 1 ? "" : "s"); };
+
+var FIL = ALL;
+function recompute() { FIL = C.filter(); }
+
+/* ---------------- map ---------------- */
+var mv = new C.MapView($("map"), {
+  onPick: function (r) { S.sel = r; closeLayers(); drawMap(); renderPoint(); revealSel(); },
+  onRedraw: function () { drawMap(); }
+});
+var iv = new C.MapView($("imap"), { forcePen: true, onRedraw: function () { renderIndiv(); } });
+
+function fitRegion() {
+  mv.fit(S.region === "pen" ? BASE.peninsula.bbox : BASE.national.bbox, 0.98, false);
+}
+
+function drawMap() {
+  if (!mv.v) return;
+  mv.size();
+  mv.drawBase();
+  var rows = FIL.filter(function (r) { return r.lat != null; });
+  if (S.region === "pen") rows = rows.filter(function (r) { return r.peninsula; });
+  if (S.mode === "den") mv.drawDensity(rows); else mv.drawPoints(rows);
+  renderKey(rows.length);
+}
+
+function renderKey(shown) {
+  var sb = C.scaleBar(mv.v.k), html;
+  if (S.mode === "den") {
+    html = "<h4>Sightings per cell</h4><div class='ramp'>" +
+      SEQ().map(function (c) { return "<i style='background:" + c + "'></i>"; }).join("") +
+      "</div><div class='row' style='justify-content:space-between;width:130px;margin-top:3px;font-size:11px'><span>1</span><span>" +
+      (mv.densMax || 1) + "</span></div>";
+  } else {
+    html = "<h4>" + plural(shown, "sighting") + " on this map</h4>" +
+      "<div class='row'><svg width='16' height='16'><circle cx='8' cy='8' r='3.5' fill='var(--accent)' stroke='var(--panel)'></circle></svg> One caracal</div>" +
+      "<div class='row'><svg width='16' height='16'><circle cx='8' cy='8' r='6.5' fill='var(--accent)' stroke='var(--panel)'></circle></svg> Two or more</div>";
+    if (S.region === "pen") html +=
+      "<div class='row'><i style='width:14px;height:10px;border-radius:2px;background:var(--park);border:1px solid var(--park-line);box-sizing:border-box;display:inline-block'></i> Table Mountain National Park</div>" +
+      "<div class='row'><i style='width:14px;height:10px;border-radius:2px;background:var(--reserve);opacity:.6;display:inline-block'></i> Other protected area</div>";
+  }
+  html += "<div class='scalebar'><span class='bar' style='width:" + sb.px + "px'></span>" + sb.km + " km</div>";
+  html += "<p class='attrib'>Tap a point for details; pinch to zoom.<br>" + esc(BASE.attribution) + "</p>";
+  $("key").innerHTML = html;
+}
+
+function closeLayers() { $("layers").hidden = true; $("layers-btn").setAttribute("aria-expanded", "false"); }
+
+/* ---------------- sighting sheet ---------------- */
+function renderPoint() {
+  var sh = $("psheet"), r = S.sel;
+  if (!r) { sh.hidden = true; sh.textContent = ""; return; }
+  var kv = C.sightingFields(r);
+  sh.innerHTML =
+    "<div class='grab' aria-hidden='true'><i></i></div>" +
+    "<div class='sheet-head'><h2 id='psheet-title'>" + esc(r.location) + "</h2>" +
+    "<button class='xbtn' id='pclose' aria-label='Close details'>&times;</button></div>" +
+    "<div class='sheet-body'>" +
+    (r.tags || r.caracal_id ? "<p style='margin:0 0 10px'><span class='pill'>" +
+      (r.caracal_id ? esc(r.caracal_id) : "Ear-tagged") + "</span></p>" : "") +
+    "<dl class='kv'>" + kv.map(function (p) {
+      return "<dt>" + p[0] + "</dt><dd>" + esc(p[1]) + "</dd>";
+    }).join("") + "</dl>" +
+    (r.response ? "<div class='quote'><h5>What the caracal did</h5>" + esc(r.response) + "</div>" : "") +
+    (r.comments ? "<div class='quote'><h5>Reporter&rsquo;s notes</h5>" + esc(r.comments) + "</div>" : "") +
+    "</div>";
+  sh.hidden = false;
+  $("pclose").addEventListener("click", closePoint);
+  swipeToClose(sh, closePoint);
+}
+/* pan so the chosen point isn't hidden under its own sheet */
+function revealSel() {
+  var sh = $("psheet");
+  if (!S.sel || S.sel.lat == null || sh.hidden) return;
+  // measured from layout, not getBoundingClientRect, which sees the slide-in animation
+  var sheetTop = innerHeight - parseFloat(getComputedStyle(sh).bottom) - sh.offsetHeight -
+                 mv.c.getBoundingClientRect().top;
+  var y = mv.sy(S.sel.lat);
+  if (y > sheetTop - 30) { mv.v.cy += (y - sheetTop / 2) / mv.v.k; drawMap(); }
+}
+function closePoint() { S.sel = null; renderPoint(); drawMap(); }
+
+/* drag a sheet down by its grab bar to dismiss it */
+function swipeToClose(sheet, close) {
+  var grab = sheet.querySelector(".grab"), y0 = null, dy = 0;
+  if (!grab || grab._swipe) return;
+  grab._swipe = true;
+  grab.addEventListener("pointerdown", function (e) {
+    y0 = e.clientY; dy = 0; grab.setPointerCapture(e.pointerId); sheet.style.transition = "none";
+  });
+  grab.addEventListener("pointermove", function (e) {
+    if (y0 == null) return;
+    dy = Math.max(0, e.clientY - y0); sheet.style.transform = "translateY(" + dy + "px)";
+  });
+  function end() {
+    if (y0 == null) return;
+    y0 = null; sheet.style.transition = ""; sheet.style.transform = "";
+    if (dy > 70) close();
+  }
+  grab.addEventListener("pointerup", end);
+  grab.addEventListener("pointercancel", end);
+}
+
+/* ---------------- filters sheet ---------------- */
+function openFilters() {
+  closeLayers();
+  $("scrim").hidden = false; $("fsheet").hidden = false;
+  $("fbtn").setAttribute("aria-expanded", "true");
+}
+function closeFilters() {
+  $("scrim").hidden = true; $("fsheet").hidden = true;
+  $("fbtn").setAttribute("aria-expanded", "false");
+}
+
+function renderFilters() {
+  $("act-chips").innerHTML = ACTS.map(function (a) {
+    return "<button class='chip' data-act='" + esc(a.name) + "' aria-pressed='" + (!!S.acts[a.name]) + "'>" +
+      esc(a.name) + "<span class='n'>" + a.n + "</span></button>";
+  }).join("");
+  $("lab-year").textContent = S.yrMin === S.yrMax ? S.yrMin : S.yrMin + "–" + S.yrMax;
+  $("lab-hour").textContent = pad2(S.hrMin) + ":00–" + pad2(S.hrMax) + ":59";
+  $("reset").disabled = C.isDefault();
+  [["seg-tag", S.tag], ["seg-dog", S.dog], ["seg-grp", S.grp], ["seg-park", S.park],
+   ["seg-region", S.region], ["seg-mode", S.mode]].forEach(function (p) {
+    each($(p[0]).querySelectorAll("button"), function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.v === p[1]));
+    });
+  });
+  var n = C.activeCount();
+  $("badge").hidden = !n; $("badge").textContent = n;
+  var more = [S.tag, S.dog, S.grp, S.park].filter(function (v) { return v !== "all"; }).length;
+  $("more-n").hidden = !more; $("more-n").textContent = more;
+  $("fdone").textContent = "Show " + plural(FIL.length, "sighting");
+}
+
+function syncInputs() {
+  $("yr-min").value = S.yrMin; $("yr-max").value = S.yrMax;
+  $("hr-min").value = S.hrMin; $("hr-max").value = S.hrMax;
+}
+
+function renderTop() {
+  var all = FIL.length === ALL.length;
+  $("ro-n").textContent = FIL.length.toLocaleString();
+  $("ro-of").textContent = all ? "sightings" : "of " + ALL.length.toLocaleString();
+}
+
+/* ---------------- animals ---------------- */
+function cat() { return CATS.filter(function (c) { return c.id === S.cat; })[0] || CATS[0]; }
+
+function buildStrip() {
+  $("catstrip").innerHTML = CATS.map(function (c) {
+    return "<button class='catchip' data-id='" + esc(c.id) + "' aria-pressed='" + (c.id === S.cat) + "'>" +
+      "<span class='nm'>" + esc(c.name || c.code) + "</span>" +
+      "<span class='ct'>" + plural(c.n, "sighting") + (c.code ? " &middot; " + esc(c.code) : "") + "</span></button>";
+  }).join("");
+}
+
+/* A phone-sized map of the whole peninsula makes one cat's trail a speck, so
+   frame the selected cat instead, while still allowing zoom out to the peninsula. */
+function fitCat() {
+  var c = cat(), b = [Infinity, Infinity, -Infinity, -Infinity], pad = 0.02;
+  c.rows.forEach(function (r) {
+    b[0] = Math.min(b[0], r.lon); b[1] = Math.min(b[1], r.lat);
+    b[2] = Math.max(b[2], r.lon); b[3] = Math.max(b[3], r.lat);
+  });
+  iv.fit(BASE.peninsula.bbox, 0.98, false);
+  var kPen = iv.v.k;
+  iv.fit([b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad], 0.86, false);
+  iv.v.k0 = Math.min(kPen, iv.v.k);
+  iv._fitW = iv.w; iv._fitH = iv.h; iv._cat = c.id;
+}
+
+function renderIndiv() {
+  var c = cat();
+  if (!c) { $("catsum").innerHTML = "<span class='muted'>No identified animals.</span>"; return; }
+  iv.size();
+  if (!iv.v || iv._fitW !== iv.w || iv._fitH !== iv.h || iv._cat !== c.id) fitCat();
+  var t = C.drawTrail(iv, c, S.reveal);
+  $("catsum").innerHTML = "<b>" + esc(c.name || c.code) + "</b> &middot; " + C.trailSpan(t) +
+    (t.n > 1 ? " &middot; " + t.places + " places" : "") +
+    (t.n > 1 ? "<span class='muted'>Darker dots are later; the ringed dot is the latest." +
+      (t.joined ? " Lines join reports under three weeks apart, not observed routes." : "") + "</span>" : "");
+  $("istamp").textContent = fmtDate(t.shown[t.shown.length - 1].date);
+  $("icount").textContent = t.upto + " / " + t.n;
+  $("iscrub").value = String(Math.round(S.reveal * 100));
+}
+
+var playTimer = null;
+function stopPlay() {
+  S.playing = false; if (playTimer) clearInterval(playTimer); playTimer = null;
+  $("play").innerHTML = "&#9654;"; $("play").setAttribute("aria-label", "Play sightings through time");
+}
+function startPlay() {
+  var c = cat(); if (!c) return;
+  if (S.reveal >= 1) S.reveal = 0;
+  S.playing = true; $("play").innerHTML = "&#10073;&#10073;";
+  $("play").setAttribute("aria-label", "Pause");
+  var step = 1 / c.rows.length;
+  playTimer = setInterval(function () {
+    S.reveal = Math.min(1, S.reveal + step);
+    renderIndiv();
+    if (S.reveal >= 1) stopPlay();
+  }, 90);
+}
+
+/* ---------------- patterns ---------------- */
+// Touch has no hover, so a tapped bar's value is written under its chart.
+var PICK = { month: null, year: null };
+
+function readout(id, d, hint) {
+  $(id).innerHTML = d ? "<b>" + esc(d.tipLabel || d.label) + "</b> &middot; " + plural(d.value, "sighting") +
+    (d.note ? " &middot; " + esc(d.note) : "") : hint;
+}
+
+function renderPat() {
+  if (!FIL.length) {
+    $("pat-lede").innerHTML = "No sightings match these filters.";
+  }
+  var tiles = C.encTiles(FIL);
+  $("tiles").innerHTML = tiles.map(function (x) {
+    var pct = x.d ? Math.round(x.v / x.d * 100) : 0;
+    return "<div class='tile'><dt>" + x.t + "</dt><dd>" + pct + "%<span class='unit'>" +
+      x.v.toLocaleString() + "</span></dd></div>";
+  }).join("");
+
+  var withHour = FIL.filter(function (r) { return r.hour != null; });
+  var hrs = C.hourCounts(withHour), hmax = Math.max.apply(null, hrs);
+  var oneHour = S.hrMin === S.hrMax;
+  var hourData = hrs.map(function (v, h) {
+    return { label: pad2(h), tipLabel: pad2(h) + ":00–" + pad2(h) + ":59", value: v, key: h,
+             peak: v === hmax && v > 0, hot: oneHour && S.hrMin === h };
+  });
+  C.barsV($("ch-hour"), hourData, { maxTicks: 5, height: 170, labelEvery: 3, onClick: function (d) {
+    if (oneHour && S.hrMin === d.key) { S.hrMin = 0; S.hrMax = 23; }
+    else { S.hrMin = d.key; S.hrMax = d.key; }
+    syncInputs(); update();
+  } });
+  if (oneHour) $("rd-hour").innerHTML = "Filtering everything to <b>" + hourData[S.hrMin].tipLabel + "</b> &middot; " +
+    plural(hourData[S.hrMin].value, "sighting") + ". Tap it again to clear.";
+  else $("rd-hour").textContent = "Tap a bar to filter everything to that hour.";
+
+  var ac = C.actCounts(FIL);
+  C.barsH($("ch-act"), ac.order.map(function (k) {
+    return { label: k, value: ac.m[k], key: k, hot: !!S.acts[k] };
+  }), { rowH: 30, onClick: function (d) {
+    if (S.acts[d.key]) delete S.acts[d.key]; else S.acts[d.key] = true;
+    update();
+  } });
+  var on = C.actsOn();
+  $("rd-act").innerHTML = on.length
+    ? "Filtering to <b>" + esc(on.join(", ")) + "</b>. Tap a bar again to clear it."
+    : ac.total ? ac.total.toLocaleString() + " reports record what the observer was doing." : "";
+
+  var mo = C.monthCounts(FIL);
+  var moData = mo.map(function (v, i) {
+    return { label: MONTHS[i][0], tipLabel: MONTHS[i], value: v, key: i, hot: PICK.month === i };
+  });
+  C.barsV($("ch-month"), moData, { maxTicks: 5, height: 150, onClick: function (d) {
+    PICK.month = PICK.month === d.key ? null : d.key; renderPat();
+  } });
+  readout("rd-month", PICK.month == null ? null : moData[PICK.month], "Tap a bar for its count.");
+
+  var yc = C.yearCounts(FIL), ys = [];
+  for (var y = S.yrMin; y <= S.yrMax; y++) ys.push(y);
+  var yData = ys.map(function (y) {
+    return { label: String(y).slice(2), tipLabel: String(y), value: yc[y] || 0, key: y,
+             dim: y === PARTIAL_YEAR && PICK.year !== y, hot: PICK.year === y,
+             note: y === PARTIAL_YEAR ? "part year only" : null };
+  });
+  C.barsV($("ch-year"), yData, { maxTicks: 5, height: 150, labelEvery: ys.length > 16 ? 4 : ys.length > 8 ? 2 : 1,
+    onClick: function (d) { PICK.year = PICK.year === d.key ? null : d.key; renderPat(); } });
+  readout("rd-year", yData.filter(function (d) { return d.key === PICK.year; })[0], "Tap a bar for its count.");
+  $("year-sub").textContent = "Growth tracks the project’s profile as much as the caracal population." +
+    (PARTIAL_YEAR >= S.yrMin && PARTIAL_YEAR <= S.yrMax ? " " + PARTIAL_YEAR + " is greyed: it runs only to " + fmtDate(LATEST) + "." : "");
+
+  if (FIL.length) {
+    var peak = hrs.indexOf(hmax);
+    $("pat-lede").innerHTML = "<strong>" + plural(FIL.length, "sighting") + "</strong> match your filters." +
+      (withHour.length ? " The busiest hour is <strong>" + pad2(peak) + ":00</strong>." : "");
+  }
+}
+
+/* ---------------- orchestration ---------------- */
+var VIEWS = ["map", "indiv", "pat", "about"];
+
+function render(v) {
+  if (v === "map") { mv.size(); drawMap(); }
+  else if (v === "indiv") renderIndiv();
+  else if (v === "pat") renderPat();
+}
+
+function update() {
+  recompute();
+  renderFilters();
+  renderTop();
+  if (S.sel && !C.pass(S.sel)) { S.sel = null; renderPoint(); }
+  if (S.view !== "indiv") render(S.view);
+}
+
+function setView(v) {
+  S.view = v;
+  VIEWS.forEach(function (k) {
+    $("view-" + k).hidden = k !== v;
+    $("tab-" + k).setAttribute("aria-selected", String(k === v));
+  });
+  if (v !== "map" && S.sel) { S.sel = null; renderPoint(); }
+  if (v !== "indiv") stopPlay();
+  closeLayers();
+  if (v === "about" && !$("notes").innerHTML) $("notes").innerHTML = C.notesHTML({ animals: "Animals", tally: false });
+  requestAnimationFrame(function () { render(v); });
+}
+
+/* ---------------- events ---------------- */
+VIEWS.forEach(function (k) {
+  $("tab-" + k).addEventListener("click", function () { setView(k); });
+});
+
+$("fbtn").addEventListener("click", openFilters);
+$("fdone").addEventListener("click", closeFilters);
+$("scrim").addEventListener("click", closeFilters);
+swipeToClose($("fsheet"), closeFilters);
+$("reset").addEventListener("click", function () { C.resetFilters(); syncInputs(); update(); });
+
+$("yr-min").addEventListener("input", function () {
+  S.yrMin = Math.min(Number(this.value), S.yrMax); this.value = S.yrMin; update();
+});
+$("yr-max").addEventListener("input", function () {
+  S.yrMax = Math.max(Number(this.value), S.yrMin); this.value = S.yrMax; update();
+});
+$("hr-min").addEventListener("input", function () {
+  S.hrMin = Math.min(Number(this.value), S.hrMax); this.value = S.hrMin; update();
+});
+$("hr-max").addEventListener("input", function () {
+  S.hrMax = Math.max(Number(this.value), S.hrMin); this.value = S.hrMax; update();
+});
+$("act-chips").addEventListener("click", function (e) {
+  var b = e.target.closest(".chip"); if (!b) return;
+  var k = b.dataset.act;
+  if (S.acts[k]) delete S.acts[k]; else S.acts[k] = true;
+  update();
+});
+[["seg-tag", "tag"], ["seg-dog", "dog"], ["seg-grp", "grp"], ["seg-park", "park"]].forEach(function (p) {
+  $(p[0]).addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    S[p[1]] = b.dataset.v; update();
+  });
+});
+
+$("layers-btn").addEventListener("click", function () {
+  var open = $("layers").hidden;
+  $("layers").hidden = !open; this.setAttribute("aria-expanded", String(open));
+});
+$("seg-region").addEventListener("click", function (e) {
+  var b = e.target.closest("button"); if (!b || b.dataset.v === S.region) return;
+  S.region = b.dataset.v; S.sel = null; renderPoint(); fitRegion(); renderFilters(); drawMap();
+});
+$("seg-mode").addEventListener("click", function (e) {
+  var b = e.target.closest("button"); if (!b) return;
+  S.mode = b.dataset.v; S.sel = null; renderPoint(); renderFilters(); drawMap();
+});
+$("zfit").addEventListener("click", function () { fitRegion(); drawMap(); });
+$("keybtn").addEventListener("click", function () {
+  var open = $("key").hidden;
+  $("key").hidden = !open; this.setAttribute("aria-expanded", String(open));
+});
+
+$("catstrip").addEventListener("click", function (e) {
+  var b = e.target.closest(".catchip"); if (!b) return;
+  S.cat = b.dataset.id; S.reveal = 1; stopPlay();
+  each(this.querySelectorAll(".catchip"), function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+  b.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
+  renderIndiv();
+});
+$("izfit").addEventListener("click", function () { if (cat()) { fitCat(); renderIndiv(); } });
+$("play").addEventListener("click", function () { if (S.playing) stopPlay(); else startPlay(); });
+$("iscrub").addEventListener("input", function () {
+  stopPlay(); S.reveal = Math.max(0.01, Number(this.value) / 100); renderIndiv();
+});
+
+document.addEventListener("keydown", function (e) {
+  if (e.key !== "Escape") return;
+  if (!$("fsheet").hidden) closeFilters();
+  else if (S.sel) closePoint();
+  else closeLayers();
+});
+
+var rt = null;
+addEventListener("resize", function () {
+  clearTimeout(rt);
+  // charts size their viewBox to the real pixel width, so rebuild on resize
+  rt = setTimeout(function () { render(S.view); }, 140);
+});
+
+var mq = matchMedia("(prefers-color-scheme: dark)");
+(mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener.bind(mq))(function () {
+  render(S.view);
+});
+
+/* ---------------- init ---------------- */
+$("yr-min").min = $("yr-max").min = Y0;
+$("yr-min").max = $("yr-max").max = Y1;
+syncInputs();
+recompute();
+renderFilters();
+renderTop();
+buildStrip();
+// Re-fit once webfonts settle: the bars above the maps change height with them.
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(function () {
+    iv._fitW = iv._fitH = null;
+    fitRegion(); render(S.view);
+  });
+}
+requestAnimationFrame(function () { fitRegion(); drawMap(); });
+})();
+</script>
