@@ -2,3 +2,7 @@
 ~$*
 __pycache__/
 build/.cache/
+# raw source data carries reporter names and emails; never commit it
+*.xlsx
+*.xls
+*.csv

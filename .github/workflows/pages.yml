@@ -1,0 +1,63 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Bundle pages
+        run: python3 build/bundle.py
+
+      # Copy an explicit allowlist, never the whole repo, so nothing else
+      # (raw data, build scripts) can end up on the public site.
+      - name: Assemble site
+        run: |
+          mkdir _site
+          cp caracal.html caracal-mobile.html _site/
+          cat > _site/index.html <<'EOF'
+          <!doctype html>
+          <meta charset="utf-8">
+          <title>Rooikat Watch</title>
+          <meta http-equiv="refresh" content="0; url=caracal.html">
+          <a href="caracal.html">Rooikat Watch</a>
+          EOF
+          ls -la _site
+
+      - name: Check nothing private is published
+        run: |
+          if find _site -type f ! -name '*.html' | grep -q .; then
+            echo "Unexpected non-HTML file in site"; find _site -type f; exit 1
+          fi
+          if grep -lE '[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[A-Za-z0-9.-]*[a-z]{2,}' _site/*.html; then
+            echo "Email-shaped text found in published pages"; exit 1
+          fi
+
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
